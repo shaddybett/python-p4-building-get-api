@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
-from random import randint, choice as rc
-
 from faker import Faker
+from random import randint, choice as rc
 
 from app import app
 from models import db, Game, Review, User
@@ -64,6 +63,7 @@ platforms = [
 ]
 
 fake = Faker()
+# ...
 
 with app.app_context():
 
@@ -77,6 +77,7 @@ with app.app_context():
         users.append(u)
 
     db.session.add_all(users)
+    db.session.commit()
 
     games = []
     for i in range(100):
@@ -89,22 +90,20 @@ with app.app_context():
         games.append(g)
 
     db.session.add_all(games)
+    db.session.commit()
 
     reviews = []
     for u in users:
-        for i in range(randint(1, 10)):
+        for g in games:
             r = Review(
                 score=randint(0, 10),
                 comment=fake.sentence(),
                 user=u,
-                game=rc(games))
+                game=g
+            )
             reviews.append(r)
 
     db.session.add_all(reviews)
-
-    for g in games:
-        r = rc(reviews)
-        g.review = r
-        reviews.remove(r)
-
     db.session.commit()
+
+    # ...
